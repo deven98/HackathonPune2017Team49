@@ -1,6 +1,7 @@
 package devapp.com.hackathonpune2017team49.Client;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import devapp.com.hackathonpune2017team49.Manager.AssignTaskActivity;
 import devapp.com.hackathonpune2017team49.Manager.ManagerRecyclerAdapter;
 import devapp.com.hackathonpune2017team49.R;
 
@@ -36,12 +38,13 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
     }
 
     @Override
-    public void onBindViewHolder(MyHolder holder, int position) {
+    public void onBindViewHolder(MyHolder holder, final int position) {
 
         holder.tvName.setText(helpers.get(position).getName());
         holder.tvDetails.setText(helpers.get(position).getDetails());
         holder.tvTime.setText(helpers.get(position).getTime());
-        holder.tvLocation.setText(helpers.get(position).getPlace().toString());
+       // holder.tvLocation.setText(helpers.get(position).getPlace().toString());
+        holder.tvDetails.setText(helpers.get(position).getLatitude()+" "+helpers.get(position).getLongitude());
 
 
 
@@ -51,6 +54,10 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
 
                 // take the latLang
 
+                Intent intent = new Intent(context , AssignTaskActivity.class);
+                intent.putExtra("Longitude" , helpers.get(position).getLongitude());
+                intent.putExtra("Latitude" , helpers.get(position).getLatitude());
+                context.startActivity(intent);
                 // start maps activity here
             }
         });
