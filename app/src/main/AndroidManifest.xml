@@ -11,15 +11,20 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".DecidingActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".Manager.ManagerActivity" />
-        <activity android:name=".Manager.AssignTaskActivity" />
+        <activity android:name=".Manager.AssignTaskActivity">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        </activity>
         <activity android:name=".Client.RecieveTaskActivity"></activity>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDCMGQzCLx_3OJRPW5bQVeo-YMZHpiFj9g"/>
     </application>
 
 </manifest>
