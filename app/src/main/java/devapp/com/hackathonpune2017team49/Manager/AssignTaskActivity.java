@@ -1,8 +1,16 @@
 package devapp.com.hackathonpune2017team49.Manager;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
@@ -36,18 +45,28 @@ public class AssignTaskActivity extends AppCompatActivity {
     String latitude;
     String longitude;
 
+    double currentLatitude;
+    double currentLongitude;
+    double[][] adjencencyMatrix;
+    int count=0;
+
     EditText nameEditText;
     EditText phoneEditText;
     TextView addressTextView;
     Button submitButton;
     EditText IDEditText;
 
+    ArrayList<Distance> listOfdistances = new ArrayList<>();
+
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
 
+    LocationManager manager;
+    LocationListener listener;
+
     public static String SELECTED_CLIENT = "00000";
 
-    void initialize(){
+    void initialize() {
 
         nameEditText = (EditText) findViewById(R.id.name_edit_text);
         addressTextView = (TextView) findViewById(R.id.address_text_view);
@@ -56,10 +75,59 @@ public class AssignTaskActivity extends AppCompatActivity {
         phoneEditText = (EditText) findViewById(R.id.phone_edit_text);
     }
 
-    void initializeFirebase(){
+    void initializeFirebase() {
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference();
+
+        manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+        listener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+
+                currentLatitude = location.getLatitude();
+                currentLongitude = location.getLongitude();
+                Distance distance = new Distance();
+                distance.setLang(currentLongitude);
+                distance.setLat(currentLatitude);
+                listOfdistances.add(distance);
+                Log.d(TAG, "onLocationChanged: current location added....");
+            }
+        };
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+     }
+
+    void startProcessing(){
+        Log.d(TAG, "onClick: submit clicked... count value is "+count);
+        count = listOfdistances.size();
+        adjencencyMatrix = new double[count+1][count+1];
+        for (int i=0; i<=count ; i++){
+            for (int j=0 ; j<=count ; j++){
+                Log.d(TAG, "startProcessing: in loop "+i +" , "+j);
+                if (i==j){
+                    // make that element 0
+                    adjencencyMatrix[i][j] =0;
+                }
+            }
+        }
+        for (int i=0; i<=count ; i++){
+            for (int j=0 ; j<=count ; j++){
+                Log.d(TAG, "startProcessing: "+adjencencyMatrix);
+            }
+        }
+
 
     }
 
@@ -69,7 +137,12 @@ public class AssignTaskActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                time = Calendar.getInstance().getTime().toString();
+                startProcessing();
+
+
+
+
+                /*time = Calendar.getInstance().getTime().toString();
                 specifics = nameEditText.getText().toString();
                 phoneNumber = phoneEditText.getText().toString();
                 taskID = IDEditText.getText().toString();
@@ -81,7 +154,7 @@ public class AssignTaskActivity extends AppCompatActivity {
                 databaseReference.child("Clients").child(SELECTED_CLIENT).child("Tasks").child(taskID).child("Name").setValue(specifics);
                 databaseReference.child("Clients").child(SELECTED_CLIENT).child("Tasks").child(taskID).child("Address").setValue(placeName);
                 databaseReference.child("Clients").child(SELECTED_CLIENT).child("Tasks").child(taskID).child("time").setValue(time);
-                databaseReference.child("Clients").child(SELECTED_CLIENT).child("Tasks").child(taskID).child("isCompleted").setValue("0");
+                databaseReference.child("Clients").child(SELECTED_CLIENT).child("Tasks").child(taskID).child("isCompleted").setValue("0");*/
             }
         });
 
@@ -99,6 +172,13 @@ public class AssignTaskActivity extends AppCompatActivity {
         setOnClickListeners();
         initializeFirebase();
 
+        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER , 200 , 0 , (android.location.LocationListener) listener);
+
+        if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+
+        }
 
 
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
@@ -117,11 +197,23 @@ public class AssignTaskActivity extends AppCompatActivity {
 
                 placeName = place.getName().toString() + place.getAddress().toString();
 
-               double dis =  distance(place.getLatLng().latitude , place.getLatLng().longitude , 23 , 24);
+               //double dis =  distance(place.getLatLng().latitude , place.getLatLng().longitude , 23 , 24);
 
-                Log.d(TAG, "onPlaceSelected: distance is "+dis);
+              Distance distance = new Distance();
+                distance.setLang(place.getLatLng().longitude);
+                distance.setLang(place.getLatLng().latitude);
+                listOfdistances.add(distance);
+                Log.d(TAG, "onPlaceSelected: location added in list");
+
+               // Log.d(TAG, "onPlaceSelected: distance is "+dis);
 
             }
+
+
+
+
+
+
 
 
             private double distance(double lat1, double lon1, double lat2, double lon2) {
@@ -146,4 +238,27 @@ public class AssignTaskActivity extends AppCompatActivity {
             }
         });
     }
+
+    public class Distance{
+
+        double lat;
+        double lang;
+
+        public double getLat() {
+            return lat;
+        }
+
+        public void setLat(double lat) {
+            this.lat = lat;
+        }
+
+        public double getLang() {
+            return lang;
+        }
+
+        public void setLang(double lang) {
+            this.lang = lang;
+        }
+    }
+
 }
