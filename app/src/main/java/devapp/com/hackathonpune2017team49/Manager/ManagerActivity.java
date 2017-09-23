@@ -113,10 +113,6 @@ public class ManagerActivity extends AppCompatActivity {
         recyclerManager.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 
-
-
-
-
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -143,16 +139,18 @@ public class ManagerActivity extends AppCompatActivity {
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+
                         empList.add(etEmpId.getText().toString());
+                        Toast.makeText(context, etEmpId.getText().toString(), Toast.LENGTH_SHORT).show();
+                        databaseReference.child("Managers").child(SELECTED_ID).child("Clients").child(etEmpId.getText().toString()).setValue("Client");
+                        databaseReference.child("Clients").child(etEmpId.getText().toString()).setValue("Client");
+
                         Log.d(TAG, "onClick: emp added");
                         //adapter = new ManagerRecyclerAdapter(empList , context);
-                        recyclerManager.setAdapter(adapter);
-                        adapter.notifyDataSetChanged();
+                        //adapter.notifyDataSetChanged();
+                        loadEmployees();
 
                         dialog.dismiss();
-
-
-
 
                     }
                 });
