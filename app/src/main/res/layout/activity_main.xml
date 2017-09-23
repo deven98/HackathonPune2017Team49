@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="devapp.com.hackathonpune2017team49.MainActivity">
+    tools:context="devapp.com.hackathonpune2017team49.DecidingActivity">
 
     <TextView
         android:layout_width="wrap_content"
