@@ -54,7 +54,7 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
 
                 // take the latLang
 
-                Intent intent = new Intent(context , AssignTaskActivity.class);
+                Intent intent = new Intent(context , MapsActivity.class);
                 intent.putExtra("Longitude" , helpers.get(position).getLongitude());
                 intent.putExtra("Latitude" , helpers.get(position).getLatitude());
                 context.startActivity(intent);

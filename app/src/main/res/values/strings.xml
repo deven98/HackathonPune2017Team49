@@ -6,4 +6,5 @@
     <string name="message_enter_id">Enter your ID here</string>
     <string name="message_please_select_place">Please select place to deliver to from above.</string>
     <string name="action_submit">Submit</string>
+    <string name="title_activity_maps">Map</string>
 </resources>
