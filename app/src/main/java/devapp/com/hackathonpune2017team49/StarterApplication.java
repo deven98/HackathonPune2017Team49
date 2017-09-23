@@ -27,13 +27,7 @@ public class StarterApplication extends Application {
         Realm.setDefaultConfiguration(configuration);
         Log.d(TAG , "Realm set");
 
-        RealmInspectorModulesProvider.builder(this)
-                .withFolder(getCacheDir())
-                .withMetaTables()
-                .withDescendingOrder()
-                .withLimit(1000)
-                .databaseNamePattern(Pattern.compile(".+\\.realm"))
-                .build();
+
 
     }
 }

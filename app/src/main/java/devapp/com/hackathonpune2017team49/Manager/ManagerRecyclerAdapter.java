@@ -37,14 +37,16 @@ public class ManagerRecyclerAdapter extends RecyclerView.Adapter<ManagerRecycler
     }
 
     @Override
-    public void onBindViewHolder(MyHolder holder, int position) {
+    public void onBindViewHolder(MyHolder holder, final int position) {
 
 
         holder.btnAddTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                context.startActivity(new Intent(context , AssignTaskActivity.class));
+                Intent intent = new Intent(context , AssignTaskActivity.class);
+                intent.putExtra("clientID" , eids.get(position));
+                context.startActivity(intent);
             }
         });
 

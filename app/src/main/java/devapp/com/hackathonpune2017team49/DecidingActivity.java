@@ -13,8 +13,10 @@ import android.widget.Toast;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import devapp.com.hackathonpune2017team49.Client.RecieveTaskActivity;
 import devapp.com.hackathonpune2017team49.Manager.ManagerActivity;
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 public class DecidingActivity extends AppCompatActivity {
 
@@ -81,8 +83,8 @@ public class DecidingActivity extends AppCompatActivity {
                     //Intent for manager
                     saveData();
 
-                    databaseReference.child("Managers").child(etEid.getText().toString()).setValue("Manager");
-                    databaseReference.child("Managers").child(etEid.getText().toString()).child("Clients").setValue("clients");
+                    databaseReference.child("Managers").child(etEid.getText().toString());
+                    databaseReference.child("Managers").child(etEid.getText().toString()).child("Clients");
 
                     ManagerActivity.SELECTED_ID = etEid.getText().toString();
 
@@ -95,7 +97,7 @@ public class DecidingActivity extends AppCompatActivity {
 
                     //Intent for is client
 
-                    startActivity(new Intent(getApplicationContext(), ManagerActivity.class));
+                    startActivity(new Intent(getApplicationContext(), RecieveTaskActivity.class));
                     saveData();
                     Toast.makeText(DecidingActivity.this, "Client!", Toast.LENGTH_SHORT).show();
 
@@ -112,6 +114,10 @@ public class DecidingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deciding);
+        RealmConfiguration configuration = new RealmConfiguration.Builder(DecidingActivity.this).deleteRealmIfMigrationNeeded().schemaVersion(4).build();
+        Realm.setDefaultConfiguration(configuration);
+        Log.d(TAG , "Realm set");
+
 
         initialize();
         setOnClickListeners();
@@ -121,6 +127,11 @@ public class DecidingActivity extends AppCompatActivity {
     }
 
     public void saveData() {
+        RealmConfiguration configuration = new RealmConfiguration.Builder(DecidingActivity.this).deleteRealmIfMigrationNeeded().schemaVersion(4).build();
+        Realm.setDefaultConfiguration(configuration);
+        Log.d(TAG , "Realm set");
+
+        realm = Realm.getDefaultInstance();
         database = realm.where(EmpDatabase.class).findFirst();
 
 

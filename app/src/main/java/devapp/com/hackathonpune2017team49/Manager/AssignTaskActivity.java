@@ -1,6 +1,8 @@
 package devapp.com.hackathonpune2017team49.Manager;
 
 import java.util.Calendar;
+
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,10 +20,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import devapp.com.hackathonpune2017team49.DecidingActivity;
 import devapp.com.hackathonpune2017team49.R;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 public class AssignTaskActivity extends AppCompatActivity {
 
+    private static final String TAG = "Test";
     String placeName;
     String specifics;
     String phoneNumber;
@@ -86,9 +92,14 @@ public class AssignTaskActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_assign_task);
 
+        SELECTED_CLIENT =  getIntent().getStringExtra("clientID");
+
+
         initialize();
         setOnClickListeners();
         initializeFirebase();
+
+
 
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);

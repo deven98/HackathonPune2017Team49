@@ -15,7 +15,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.facebook.stetho.inspector.protocol.module.Database;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,7 +25,9 @@ import java.util.ArrayList;
 
 import devapp.com.hackathonpune2017team49.EmpDatabase;
 import devapp.com.hackathonpune2017team49.R;
+import devapp.com.hackathonpune2017team49.StarterApplication;
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 public class ManagerActivity extends AppCompatActivity {
 
@@ -55,6 +56,11 @@ public class ManagerActivity extends AppCompatActivity {
     }
 
     void initializeRealm() {
+        RealmConfiguration configuration = new RealmConfiguration.Builder(ManagerActivity.this).deleteRealmIfMigrationNeeded().schemaVersion(4).build();
+        Realm.setDefaultConfiguration(configuration);
+        Log.d(TAG , "Realm set");
+
+
         realm = Realm.getDefaultInstance();
         database = realm.where(EmpDatabase.class).findFirst();
         if (database != null) {
@@ -74,9 +80,11 @@ public class ManagerActivity extends AppCompatActivity {
                 public void onDataChange(DataSnapshot dataSnapshot){
                     Iterable<DataSnapshot> dataSnapshots = dataSnapshot.child("Managers").child(SELECTED_ID).child("Clients").getChildren();
 
+
                     for(DataSnapshot d : dataSnapshots){
-                        empList.add(d.getKey());
-                        Toast.makeText(context, d.getKey() , Toast.LENGTH_SHORT).show();
+
+                        if (!empList.contains(d.getKey()))
+                            empList.add(d.getKey());
                     }
 
                     adapter.notifyDataSetChanged();
