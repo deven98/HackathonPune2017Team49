@@ -8,12 +8,22 @@ import com.google.android.gms.location.places.Place;
 
 public class TaskHelper {
 
+    String taskID;
     String place;
     String name;
     String time;
     String details;
     String latitude;
     String longitude;
+
+
+    public String getTaskID() {
+        return taskID;
+    }
+
+    public void setTaskID(String taskID) {
+        this.taskID = taskID;
+    }
 
     public String getLatitude() {
         return latitude;

@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -20,7 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.location.LocationListener;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
@@ -73,31 +72,6 @@ public class AssignTaskActivity extends AppCompatActivity {
         submitButton = (Button) findViewById(R.id.button_submit);
         IDEditText = (EditText) findViewById(R.id.id_edit_text);
         phoneEditText = (EditText) findViewById(R.id.phone_edit_text);
-
-        manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
-        listener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                Toast.makeText(AssignTaskActivity.this, location.toString() , Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        };
-
     }
 
     void initializeFirebase() {
@@ -105,25 +79,82 @@ public class AssignTaskActivity extends AppCompatActivity {
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference();
 
+
+
+       listener = new LocationListener() {
+           @Override
+           public void onLocationChanged(Location location) {
+               currentLatitude = location.getLatitude();
+               currentLongitude = location.getLongitude();
+               Distance distance = new Distance();
+               distance.setLang(currentLongitude);
+               distance.setLat(currentLatitude);
+               //listOfdistances.add(distance);
+               Log.d(TAG, "onLocationChanged: current location added....");
+           }
+
+           @Override
+           public void onStatusChanged(String provider, int status, Bundle extras) {
+
+           }
+
+           @Override
+           public void onProviderEnabled(String provider) {
+
+           }
+
+           @Override
+           public void onProviderDisabled(String provider) {
+
+           }
+       };
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
      }
 
     void startProcessing(){
-        Log.d(TAG, "onClick: submit clicked... count value is "+count);
+
         count = listOfdistances.size();
-        adjencencyMatrix = new double[count+1][count+1];
-        for (int i=0; i<=count ; i++){
-            for (int j=0 ; j<=count ; j++){
+        Log.d(TAG, "onClick: submit clicked... count value is "+count);
+
+
+        adjencencyMatrix = new double[count][count];
+        for (int i=0; i<count ; i++){
+            for (int j=0 ; j<count ; j++){
                 Log.d(TAG, "startProcessing: in loop "+i +" , "+j);
+
+                adjencencyMatrix[i][j] = distance(listOfdistances.get(i).getLat() , listOfdistances.get(i).getLang(),
+                        listOfdistances.get(j).getLat() , listOfdistances.get(j).getLang());
+
+
                 if (i==j){
                     // make that element 0
                     adjencencyMatrix[i][j] =0;
+
+                    Log.d(TAG, "startProcessing: making "+i +j + " 0");
                 }
             }
         }
-        for (int i=0; i<=count ; i++){
-            for (int j=0 ; j<=count ; j++){
-                Log.d(TAG, "startProcessing: "+adjencencyMatrix);
+        Log.d(TAG, "startProcessing: see the distances");
+        for (int i=0; i<count ; i++){
+            for (int j=0 ; j<count ; j++){
+                Log.d(TAG, "startProcessing: "+adjencencyMatrix[i][j]);
             }
+        }
+
+        ArrayList<Integer> result = new ArrayList<>();
+       result =  TSP.getMinDistance(adjencencyMatrix , count);
+        for(int i : result){
+            Log.d(TAG, "startProcessing: node visited is "+result.get(i));
         }
 
 
@@ -135,24 +166,26 @@ public class AssignTaskActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                startProcessing();
+               // startProcessing();
 
 
 
 
-                /*time = Calendar.getInstance().getTime().toString();
+                time = Calendar.getInstance().getTime().toString();
                 specifics = nameEditText.getText().toString();
                 phoneNumber = phoneEditText.getText().toString();
                 taskID = IDEditText.getText().toString();
 
-                Toast.makeText(AssignTaskActivity.this, time + specifics + phoneNumber + placeName , Toast.LENGTH_SHORT).show();
 
                 databaseReference.child("Clients").child(SELECTED_CLIENT).child("Tasks").child(taskID).child("Latitude").setValue(latitude);
                 databaseReference.child("Clients").child(SELECTED_CLIENT).child("Tasks").child(taskID).child("Longitude").setValue(longitude);
                 databaseReference.child("Clients").child(SELECTED_CLIENT).child("Tasks").child(taskID).child("Name").setValue(specifics);
                 databaseReference.child("Clients").child(SELECTED_CLIENT).child("Tasks").child(taskID).child("Address").setValue(placeName);
                 databaseReference.child("Clients").child(SELECTED_CLIENT).child("Tasks").child(taskID).child("time").setValue(time);
-                databaseReference.child("Clients").child(SELECTED_CLIENT).child("Tasks").child(taskID).child("isCompleted").setValue("0");*/
+                databaseReference.child("Clients").child(SELECTED_CLIENT).child("Tasks").child(taskID).child("isCompleted").setValue("0");
+                databaseReference.child("Clients").child(SELECTED_CLIENT).child("Tasks").child(taskID).child("isTaskStarted").setValue("0");
+                finish();
+
             }
         });
 
@@ -166,20 +199,23 @@ public class AssignTaskActivity extends AppCompatActivity {
         SELECTED_CLIENT =  getIntent().getStringExtra("clientID");
 
 
+        initialize();
+        setOnClickListeners();
+        initializeFirebase();
+        Distance dis = new Distance();
+        dis.setLat(18.5831363);
+        dis.setLang(73.7419016);
+        listOfdistances.add(dis);
+  //      manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+//        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER , 20 , 0 ,  listener);
+
         if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
 
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
 
         }
 
-        initialize();
-        setOnClickListeners();
-        initializeFirebase();
-
-        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER , 0L , 0f ,listener);
-
-        if(manager.getLastKnownLocation(LocationManager.GPS_PROVIDER) != null)
-        Toast.makeText(this, manager.getLastKnownLocation(LocationManager.GPS_PROVIDER).toString(), Toast.LENGTH_SHORT).show();
 
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -216,21 +252,7 @@ public class AssignTaskActivity extends AppCompatActivity {
 
 
 
-            private double distance(double lat1, double lon1, double lat2, double lon2) {
-                double theta = lon1 - lon2;
-                double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
-                dist = Math.acos(dist);
-                dist = rad2deg(dist);
-                dist = dist * 60 * 1.1515;
-                return (dist);
-            }
 
-            private double deg2rad(double deg) {
-                return (deg * Math.PI / 180.0);
-            }
-            private double rad2deg(double rad) {
-                return (rad * 180.0 / Math.PI);
-            }
             @Override
             public void onError(Status status) {
                 // TODO: Handle the error.
@@ -238,6 +260,23 @@ public class AssignTaskActivity extends AppCompatActivity {
             }
         });
     }
+    public double distance(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        return (dist);
+    }
+
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+    private double rad2deg(double rad) {
+        return (rad * 180.0 / Math.PI);
+    }
+
+
 
     public class Distance{
 

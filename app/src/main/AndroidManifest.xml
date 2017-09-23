@@ -34,7 +34,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".Manager.ManagerActivity" />
-        <activity android:name=".Manager.AssignTaskActivity" />
+        <activity android:name=".Manager.AssignTaskActivity" >
+
+            </activity>
         <activity android:name=".Client.RecieveTaskActivity" />
         <activity android:name=".Client.MapsActivity" />
         <activity android:name=".Client.SelectUtilActivity">

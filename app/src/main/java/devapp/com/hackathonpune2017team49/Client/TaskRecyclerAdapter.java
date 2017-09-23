@@ -8,6 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -25,6 +32,8 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
     private static final String TAG = "Test";
     ArrayList<TaskHelper> helpers;
     Context context;
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference databaseReference;
 
     public TaskRecyclerAdapter(ArrayList<TaskHelper> helpers, Context context) {
         this.helpers = helpers;
@@ -44,8 +53,63 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
         holder.tvDetails.setText(helpers.get(position).getDetails());
         holder.tvTime.setText(helpers.get(position).getTime());
        // holder.tvLocation.setText(helpers.get(position).getPlace().toString());
-        holder.tvDetails.setText(helpers.get(position).getLatitude()+" "+helpers.get(position).getLongitude());
+        holder.tvDetails.setText(helpers.get(position).getTaskID());
 
+        if (!RecieveTaskActivity.isClient){
+
+            holder.btnStartTask.setText("View Progress");
+
+        }
+
+        holder.btnStartTask.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!RecieveTaskActivity.isClient) {
+
+                    firebaseDatabase = FirebaseDatabase.getInstance();
+                    databaseReference = firebaseDatabase.getReference();
+                    databaseReference.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            String isTaskStarted = (String) dataSnapshot.child("Clients").child(RecieveTaskActivity.employeeID).child("Tasks").child(helpers.get(position).getTaskID()).child("isTaskStarted").getValue();
+
+                            if (isTaskStarted.equals("0")){
+                                Toast.makeText(context , "Task not yet started ...", Toast.LENGTH_SHORT).show();
+                            }else {
+                               String lat = (String) dataSnapshot.child("Clients").child(RecieveTaskActivity.employeeID).child("Tasks").child(helpers.get(position).getTaskID()).child("CurrentLat").getValue();
+                               String longitude = (String) dataSnapshot.child("Clients").child(RecieveTaskActivity.employeeID).child("Tasks").child(helpers.get(position).getTaskID()).child("CurrentLong").getValue();
+
+                                Intent intent = new Intent(context , MapsActivity.class);
+                                intent.putExtra("Longitude" , longitude);
+                                intent.putExtra("Latitude" , lat);
+                                context.startActivity(intent);
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+
+
+                }else {
+                    firebaseDatabase = FirebaseDatabase.getInstance();
+                    databaseReference = firebaseDatabase.getReference();
+                    databaseReference.child("Clients").child(RecieveTaskActivity.employeeID).child("Tasks").child(helpers.get(position).getTaskID()).child("isTaskStarted").setValue("1");
+                    databaseReference.child("Clients").child(RecieveTaskActivity.employeeID).child("Tasks").child(helpers.get(position).getTaskID()).child("CurrentLat").setValue("18.5831363");
+                    databaseReference.child("Clients").child(RecieveTaskActivity.employeeID).child("Tasks").child(helpers.get(position).getTaskID()).child("CurrentLong").setValue("73.7419016");
+
+                }
+
+
+
+
+            }
+        });
 
 
         holder.btnMaps.setOnClickListener(new View.OnClickListener() {
@@ -53,7 +117,6 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
             public void onClick(View v) {
 
                 // take the latLang
-
                 Intent intent = new Intent(context , MapsActivity.class);
                 intent.putExtra("Longitude" , helpers.get(position).getLongitude());
                 intent.putExtra("Latitude" , helpers.get(position).getLatitude());
@@ -71,7 +134,7 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
     public class MyHolder extends RecyclerView.ViewHolder{
 
         TextView tvLocation , tvTime , tvDetails, tvName;
-        Button btnMaps;
+        Button btnMaps , btnStartTask;
         public MyHolder(View itemView) {
             super(itemView);
             tvLocation = (TextView) itemView.findViewById(R.id.tvLoc);
@@ -79,7 +142,7 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
             tvDetails = (TextView) itemView.findViewById(R.id.tvDetails);
             tvName = (TextView) itemView.findViewById(R.id.tvName);
             btnMaps = (Button) itemView.findViewById(R.id.btnMap);
-
+            btnStartTask = (Button) itemView.findViewById(R.id.btnStartTask);
         }
     }
 

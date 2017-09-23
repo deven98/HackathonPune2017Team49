@@ -99,7 +99,10 @@ public class DecidingActivity extends AppCompatActivity {
 
                     //Intent for is client
 
-                    startActivity(new Intent(getApplicationContext(), RecieveTaskActivity.class));
+                    Intent intent = new Intent(DecidingActivity.this , RecieveTaskActivity.class);
+                    intent.putExtra("User" , "Client");
+
+                    startActivity(intent);
                     saveData();
                     Toast.makeText(DecidingActivity.this, "Client!", Toast.LENGTH_SHORT).show();
 
