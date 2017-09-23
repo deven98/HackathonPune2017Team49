@@ -13,6 +13,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import com.facebook.stetho.inspector.protocol.module.Database;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -23,32 +31,79 @@ import io.realm.Realm;
 public class ManagerActivity extends AppCompatActivity {
 
     private static final String TAG = "Test";
-    static String eid;
+
+    public static String SELECTED_ID="000000";
+
+    public static String employeeID;
+
     Realm realm;
     EmpDatabase database;
-    ArrayList<String> empList ;
+    ArrayList<String> empList = new ArrayList<>() ;
     RecyclerView recyclerManager;
     RecyclerView.LayoutManager layoutManager;
     Context context = ManagerActivity.this;
     ManagerRecyclerAdapter adapter;
 
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference databaseReference;
+
+    void initializeFirebase(){
+
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference();
+
+    }
+
+    void initializeRealm(){
+        realm = Realm.getDefaultInstance();
+        database = realm.where(EmpDatabase.class).findFirst();
+
+        if (database != null){
+            employeeID = database.getEid();
+            Toast.makeText(context, "EID : " + employeeID, Toast.LENGTH_SHORT).show();
+        }else {
+            Log.d(TAG, "onCreate: Realm is null");
+        }
+    }
+
+    void loadEmployees(){
+
+        try {
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot){
+                    Iterable<DataSnapshot> dataSnapshots = dataSnapshot.child("Managers").child(SELECTED_ID).child("Clients").getChildren();
+
+                    //Toast.makeText(context, SELECTED_ID , Toast.LENGTH_SHORT).show();
+
+                    for(DataSnapshot d : dataSnapshots){
+                        empList.add(d.getKey());
+                    }
+
+                    adapter.notifyDataSetChanged();
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manager);
-        empList = new ArrayList<>();
-        realm = Realm.getDefaultInstance();
-        database = realm.where(EmpDatabase.class).findFirst();
-        if (database != null){
-            eid = database.getEid();
-        }else {
-            Log.d(TAG, "onCreate: Realm is null");
-        }
 
+        initializeFirebase();
+        initializeRealm();
 
-
-        empList = new ArrayList<>();
-
+        loadEmployees();
 
         recyclerManager = (RecyclerView) findViewById(R.id.recyclermanager);
         layoutManager = new LinearLayoutManager(context );
@@ -57,10 +112,6 @@ public class ManagerActivity extends AppCompatActivity {
         adapter = new ManagerRecyclerAdapter(empList , context);
         recyclerManager.setAdapter(adapter);
         adapter.notifyDataSetChanged();
-
-
-
-
 
     }
     @Override
@@ -110,4 +161,10 @@ public class ManagerActivity extends AppCompatActivity {
 
 
     }
+
+    void getEmployees(){
+
     }
+
+}
+

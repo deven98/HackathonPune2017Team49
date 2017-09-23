@@ -10,6 +10,9 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import devapp.com.hackathonpune2017team49.Manager.ManagerActivity;
 import io.realm.Realm;
 
@@ -29,6 +32,16 @@ public class DecidingActivity extends AppCompatActivity {
     EditText etEid;
 
     EmpDatabase database;
+
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference databaseReference;
+
+    void initializeFirebase(){
+
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference();
+
+    }
 
     void initialize(){
 
@@ -67,17 +80,27 @@ public class DecidingActivity extends AppCompatActivity {
                 if(isManager){
                     //Intent for manager
 
+                    databaseReference.child("Managers").child(etEid.getText().toString()).setValue("Manager");
+                    databaseReference.child("Managers").child(etEid.getText().toString()).child("Clients").setValue("clients");
+
+                    ManagerActivity.SELECTED_ID = etEid.getText().toString();
+
                     startActivity(new Intent(getApplicationContext() , ManagerActivity.class));
 
-
                     Toast.makeText(DecidingActivity.this, "Manager!", Toast.LENGTH_SHORT).show();
+
                 }else if(isClient){
+
                     //Intent for is client
+
                     startActivity(new Intent(getApplicationContext() , ManagerActivity.class));
 
                     Toast.makeText(DecidingActivity.this, "Client!", Toast.LENGTH_SHORT).show();
+
                 }else{
+
                     Toast.makeText(DecidingActivity.this, "At least one option should be chosen.", Toast.LENGTH_SHORT).show();
+
                 }
 
             }
@@ -92,9 +115,9 @@ public class DecidingActivity extends AppCompatActivity {
 
         initialize();
         setOnClickListeners();
+        initializeFirebase();
 
         database = realm.where(EmpDatabase.class).findFirst();
-
 
         if (database != null){
 
@@ -124,10 +147,9 @@ public class DecidingActivity extends AppCompatActivity {
                     Log.d(TAG, "execute: realm stuff done");
                 }
             });
+
         }
 
-
     }
-
 
 }
