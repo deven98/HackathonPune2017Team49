@@ -1,6 +1,5 @@
 package devapp.com.hackathonpune2017team49.Client;
 
-import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -13,26 +12,18 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import devapp.com.hackathonpune2017team49.R;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class UtilMapActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-
-    double latitude,longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        setContentView(R.layout.activity_util_map);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        Intent in = getIntent();
-
-        latitude = Double.parseDouble(in.getStringExtra("Latitude"));
-        longitude = Double.parseDouble(in.getStringExtra("Longitude"));
-
     }
 
 
@@ -50,10 +41,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng deliveryPosition = new LatLng(latitude, longitude);
-        mMap.addMarker(new MarkerOptions().position(deliveryPosition).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(deliveryPosition));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(deliveryPosition,17));
-
+        LatLng sydney = new LatLng(-34, 151);
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 }
