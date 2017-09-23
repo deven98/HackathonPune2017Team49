@@ -166,9 +166,6 @@ public class AssignTaskActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-               // startProcessing();
-
-
 
 
                 time = Calendar.getInstance().getTime().toString();
