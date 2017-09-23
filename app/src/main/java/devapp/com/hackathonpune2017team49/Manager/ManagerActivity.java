@@ -54,14 +54,14 @@ public class ManagerActivity extends AppCompatActivity {
 
     }
 
-    void initializeRealm(){
+    void initializeRealm() {
         realm = Realm.getDefaultInstance();
         database = realm.where(EmpDatabase.class).findFirst();
-
-        if (database != null){
+        if (database != null) {
             employeeID = database.getEid();
-            Toast.makeText(context, "EID : " + employeeID, Toast.LENGTH_SHORT).show();
-        }else {
+            SELECTED_ID = employeeID;
+            loadEmployees();
+        } else {
             Log.d(TAG, "onCreate: Realm is null");
         }
     }
@@ -74,7 +74,7 @@ public class ManagerActivity extends AppCompatActivity {
                 public void onDataChange(DataSnapshot dataSnapshot){
                     Iterable<DataSnapshot> dataSnapshots = dataSnapshot.child("Managers").child(SELECTED_ID).child("Clients").getChildren();
 
-                    //Toast.makeText(context, SELECTED_ID , Toast.LENGTH_SHORT).show();
+                    empList = new ArrayList<>();
 
                     for(DataSnapshot d : dataSnapshots){
                         empList.add(d.getKey());
@@ -112,6 +112,10 @@ public class ManagerActivity extends AppCompatActivity {
         adapter = new ManagerRecyclerAdapter(empList , context);
         recyclerManager.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+
+
+
+
 
     }
     @Override

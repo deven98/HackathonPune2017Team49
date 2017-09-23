@@ -36,14 +36,14 @@ public class DecidingActivity extends AppCompatActivity {
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
 
-    void initializeFirebase(){
+    void initializeFirebase() {
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference();
 
     }
 
-    void initialize(){
+    void initialize() {
 
         clientRadioButton = (RadioButton) findViewById(R.id.radioButton_client);
         managerRadioButton = (RadioButton) findViewById(R.id.radioButton_manager);
@@ -53,7 +53,7 @@ public class DecidingActivity extends AppCompatActivity {
 
     }
 
-    void setOnClickListeners(){
+    void setOnClickListeners() {
 
         clientRadioButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,30 +77,30 @@ public class DecidingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(isManager){
+                if (isManager) {
                     //Intent for manager
+                    saveData();
 
                     databaseReference.child("Managers").child(etEid.getText().toString()).setValue("Manager");
                     databaseReference.child("Managers").child(etEid.getText().toString()).child("Clients").setValue("clients");
 
                     ManagerActivity.SELECTED_ID = etEid.getText().toString();
 
-                    startActivity(new Intent(getApplicationContext() , ManagerActivity.class));
+                    startActivity(new Intent(getApplicationContext(), ManagerActivity.class));
+
 
                     Toast.makeText(DecidingActivity.this, "Manager!", Toast.LENGTH_SHORT).show();
 
-                }else if(isClient){
+                } else if (isClient) {
 
                     //Intent for is client
 
-                    startActivity(new Intent(getApplicationContext() , ManagerActivity.class));
-
+                    startActivity(new Intent(getApplicationContext(), ManagerActivity.class));
+                    saveData();
                     Toast.makeText(DecidingActivity.this, "Client!", Toast.LENGTH_SHORT).show();
 
-                }else{
-
+                } else {
                     Toast.makeText(DecidingActivity.this, "At least one option should be chosen.", Toast.LENGTH_SHORT).show();
-
                 }
 
             }
@@ -117,9 +117,14 @@ public class DecidingActivity extends AppCompatActivity {
         setOnClickListeners();
         initializeFirebase();
 
+
+    }
+
+    public void saveData() {
         database = realm.where(EmpDatabase.class).findFirst();
 
-        if (database != null){
+
+        if (database != null) {
 
             realm.beginTransaction();
             database.setClient(isClient);
@@ -131,10 +136,11 @@ public class DecidingActivity extends AppCompatActivity {
                 @Override
                 public void execute(Realm realm) {
                     realm.copyToRealmOrUpdate(database);
+                    Log.d(TAG, "execute: data saved");
                 }
             });
 
-        }else {
+        } else {
             Log.d(TAG, "onCreate: realm is null");
             database = new EmpDatabase();
             database.setClient(isClient);
@@ -147,9 +153,10 @@ public class DecidingActivity extends AppCompatActivity {
                     Log.d(TAG, "execute: realm stuff done");
                 }
             });
-
         }
 
+
     }
+
 
 }
