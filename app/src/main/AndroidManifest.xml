@@ -3,6 +3,7 @@
     package="devapp.com.hackathonpune2017team49">
 
     <application
+        android:name=".StarterApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/header"

@@ -1,8 +1,11 @@
 package devapp.com.hackathonpune2017team49.Manager;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,6 +27,11 @@ public class ManagerActivity extends AppCompatActivity {
     Realm realm;
     EmpDatabase database;
     ArrayList<String> empList ;
+    RecyclerView recyclerManager;
+    RecyclerView.LayoutManager layoutManager;
+    Context context = ManagerActivity.this;
+    ManagerRecyclerAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +44,23 @@ public class ManagerActivity extends AppCompatActivity {
         }else {
             Log.d(TAG, "onCreate: Realm is null");
         }
+
+
+
+        empList = new ArrayList<>();
+
+
+        recyclerManager = (RecyclerView) findViewById(R.id.recyclermanager);
+        layoutManager = new LinearLayoutManager(context );
+
+        recyclerManager.setLayoutManager(layoutManager);
+        adapter = new ManagerRecyclerAdapter(empList , context);
+        recyclerManager.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+
+
+
 
     }
     @Override
@@ -58,13 +83,18 @@ public class ManagerActivity extends AppCompatActivity {
                 dialog.setCancelable(true);
                 Button button = (Button) dialog.findViewById(R.id.save);
                 dialog.show();
-                final EditText etEmpId = (EditText) dialog.findViewById(R.id.addEmp);
+                final EditText etEmpId = (EditText) dialog.findViewById(R.id.et_addEmp);
 
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         empList.add(etEmpId.getText().toString());
                         Log.d(TAG, "onClick: emp added");
+                        //adapter = new ManagerRecyclerAdapter(empList , context);
+                        recyclerManager.setAdapter(adapter);
+                        adapter.notifyDataSetChanged();
+
+                        dialog.dismiss();
 
 
 

@@ -7,19 +7,19 @@
     tools:context="devapp.com.hackathonpune2017team49.Manager.ManagerActivity" >
 
     <android.support.v7.widget.RecyclerView
-        android:layout_width="373dp"
-        android:layout_height="499dp"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="8dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/recyclermanager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        tools:layout_editor_absoluteY="4dp"
+        app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteX="3dp"
-        android:id="@+id/recyclermanager"/>
+        tools:layout_editor_absoluteY="4dp" />
 </android.support.constraint.ConstraintLayout>
 
 

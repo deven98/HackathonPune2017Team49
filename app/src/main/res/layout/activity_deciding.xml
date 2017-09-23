@@ -84,14 +84,14 @@
         android:layout_marginTop="8dp"
         android:text="@string/message_sign_in"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.464"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radioButton_client"
         app:layout_constraintVertical_bias="0.713" />
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/etEid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
