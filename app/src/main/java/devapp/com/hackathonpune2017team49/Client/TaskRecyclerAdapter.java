@@ -2,6 +2,8 @@ package devapp.com.hackathonpune2017team49.Client;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +18,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import devapp.com.hackathonpune2017team49.Manager.AssignTaskActivity;
 import devapp.com.hackathonpune2017team49.Manager.ManagerRecyclerAdapter;
@@ -128,6 +132,17 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
                     if (isTaskAlive){
                         // end the task
                         Toast.makeText(context , "Task ended..." , Toast.LENGTH_SHORT).show();
+
+                        Geocoder geocoder = new Geocoder(context);
+
+                        String pincode = "";
+
+                        try {
+                            List<Address> addresses = geocoder.getFromLocation(lat,lon,1);
+                            pincode = addresses.get(0).getPostalCode();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
 
 
                         holder.btnStartTask.setVisibility(View.GONE);
