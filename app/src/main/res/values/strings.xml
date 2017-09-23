@@ -2,4 +2,6 @@
     <string name="app_name">HackathonPune2017Team49</string>
     <string name="title">Placeholder</string>
     <string name="header">SmartSales</string>
+    <string name="message_sign_in">Sign In</string>
+    <string name="message_enter_id">Enter your ID here</string>
 </resources>
