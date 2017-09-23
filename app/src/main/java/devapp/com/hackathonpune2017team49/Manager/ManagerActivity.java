@@ -74,10 +74,9 @@ public class ManagerActivity extends AppCompatActivity {
                 public void onDataChange(DataSnapshot dataSnapshot){
                     Iterable<DataSnapshot> dataSnapshots = dataSnapshot.child("Managers").child(SELECTED_ID).child("Clients").getChildren();
 
-                    empList = new ArrayList<>();
-
                     for(DataSnapshot d : dataSnapshots){
                         empList.add(d.getKey());
+                        Toast.makeText(context, d.getKey() , Toast.LENGTH_SHORT).show();
                     }
 
                     adapter.notifyDataSetChanged();
