@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -109,7 +108,6 @@ public class UtilMapActivity extends FragmentActivity implements OnMapReadyCallb
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            Toast.makeText(UtilMapActivity.this, s , Toast.LENGTH_SHORT).show();
             PlaceUtils.parseJSON(s,mMap);
         }
     }

@@ -1,11 +1,15 @@
 package devapp.com.hackathonpune2017team49.Client;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,7 +65,37 @@ public class RecieveTaskActivity extends AppCompatActivity {
 
     }
 
+
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.utils, menu);
+        if (isClient){
+            return true;
+
+        }else {
+         return false;
+        }
+     }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+
+        switch (item.getItemId()) {
+
+            case R.id.utils:
+                startActivity(new Intent(RecieveTaskActivity.this , SelectUtilActivity.class));
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+
+    }
+
+
+            @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recieve_task);
@@ -106,7 +140,6 @@ public class RecieveTaskActivity extends AppCompatActivity {
                     try {
                         Log.d(TAG, "onDataChange: address is " + d.child("Address").getValue());
 
-                        Toast.makeText(context, d.toString(), Toast.LENGTH_SHORT).show();
                         notHelping = new TaskHelper();
                         notHelping.setLongitude(d.child("Longitude").getValue().toString());
                         notHelping.setName(d.child("Name").getValue().toString());

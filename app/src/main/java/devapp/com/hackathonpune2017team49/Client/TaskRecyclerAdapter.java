@@ -34,6 +34,10 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
     Context context;
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
+    boolean isTaskAlive = false;
+
+    double lat = 18.5831363;
+    double lon = 73.7419016;
 
     public TaskRecyclerAdapter(ArrayList<TaskHelper> helpers, Context context) {
         this.helpers = helpers;
@@ -47,7 +51,9 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
     }
 
     @Override
-    public void onBindViewHolder(MyHolder holder, final int position) {
+    public void onBindViewHolder(final MyHolder holder, final int position) {
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference();
 
         holder.tvName.setText(helpers.get(position).getName());
         holder.tvDetails.setText(helpers.get(position).getDetails());
@@ -59,6 +65,29 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
 
             holder.btnStartTask.setText("View Progress");
 
+        }else {
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    String isTaskStarted = (String) dataSnapshot.child("Clients").child(RecieveTaskActivity.employeeID).child("Tasks").child(helpers.get(position).getTaskID()).child("isTaskStarted").getValue();
+
+                    if (!isTaskStarted.equals("0")){
+
+                        holder.btnStartTask.setText("End Task");
+                        isTaskAlive = true;
+                    }else {
+                        isTaskAlive = false;
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
         }
 
         holder.btnStartTask.setOnClickListener(new View.OnClickListener() {
@@ -66,8 +95,6 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
             public void onClick(View v) {
                 if (!RecieveTaskActivity.isClient) {
 
-                    firebaseDatabase = FirebaseDatabase.getInstance();
-                    databaseReference = firebaseDatabase.getReference();
                     databaseReference.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -97,11 +124,25 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
 
 
                 }else {
-                    firebaseDatabase = FirebaseDatabase.getInstance();
-                    databaseReference = firebaseDatabase.getReference();
-                    databaseReference.child("Clients").child(RecieveTaskActivity.employeeID).child("Tasks").child(helpers.get(position).getTaskID()).child("isTaskStarted").setValue("1");
-                    databaseReference.child("Clients").child(RecieveTaskActivity.employeeID).child("Tasks").child(helpers.get(position).getTaskID()).child("CurrentLat").setValue("18.5831363");
-                    databaseReference.child("Clients").child(RecieveTaskActivity.employeeID).child("Tasks").child(helpers.get(position).getTaskID()).child("CurrentLong").setValue("73.7419016");
+
+                    if (isTaskAlive){
+                        // end the task
+                        Toast.makeText(context , "Task ended..." , Toast.LENGTH_SHORT).show();
+
+
+                        holder.btnStartTask.setVisibility(View.GONE);
+
+                        databaseReference.child("Clients").child(RecieveTaskActivity.employeeID).child("Tasks").child(helpers.get(position).getTaskID()).child("isTaskStarted").setValue("0");
+                    }else {
+
+                        firebaseDatabase = FirebaseDatabase.getInstance();
+                        databaseReference = firebaseDatabase.getReference();
+                        databaseReference.child("Clients").child(RecieveTaskActivity.employeeID).child("Tasks").child(helpers.get(position).getTaskID()).child("isTaskStarted").setValue("1");
+                        databaseReference.child("Clients").child(RecieveTaskActivity.employeeID).child("Tasks").child(helpers.get(position).getTaskID()).child("CurrentLat").setValue("18.5831363");
+                        databaseReference.child("Clients").child(RecieveTaskActivity.employeeID).child("Tasks").child(helpers.get(position).getTaskID()).child("CurrentLong").setValue("73.7419016");
+
+                    }
+
 
                 }
 

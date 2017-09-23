@@ -148,7 +148,6 @@ public class ManagerActivity extends AppCompatActivity {
                     public void onClick(View view) {
 
                         empList.add(etEmpId.getText().toString());
-                        Toast.makeText(context, etEmpId.getText().toString(), Toast.LENGTH_SHORT).show();
                         databaseReference.child("Managers").child(SELECTED_ID).child("Clients").child(etEmpId.getText().toString()).setValue("Client");
                         databaseReference.child("Clients").child(etEmpId.getText().toString()).setValue("Client");
 
