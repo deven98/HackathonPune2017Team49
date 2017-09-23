@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import devapp.com.hackathonpune2017team49.Client.RecieveTaskActivity;
 import devapp.com.hackathonpune2017team49.R;
 
 /**
@@ -40,6 +41,17 @@ public class ManagerRecyclerAdapter extends RecyclerView.Adapter<ManagerRecycler
     public void onBindViewHolder(MyHolder holder, final int position) {
 
 
+        holder.btnProgress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context , RecieveTaskActivity.class);
+                intent.putExtra("EID" , eids.get(position));
+                intent.putExtra("User" , "Manager");
+                context.startActivity(intent);
+
+            }
+        });
+
         holder.btnAddTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,11 +76,12 @@ public class ManagerRecyclerAdapter extends RecyclerView.Adapter<ManagerRecycler
     public class MyHolder extends RecyclerView.ViewHolder{
 
         TextView tvEid;
-        Button btnAddTask;
+        Button btnAddTask , btnProgress;
         public MyHolder(View itemView) {
             super(itemView);
             tvEid = (TextView) itemView.findViewById(R.id.tvEmpid);
             btnAddTask = (Button) itemView.findViewById(R.id.empButton);
+            btnProgress = (Button) itemView.findViewById(R.id.btnProgress);
         }
     }
 }

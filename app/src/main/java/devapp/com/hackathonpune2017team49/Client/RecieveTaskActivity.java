@@ -39,9 +39,10 @@ public class RecieveTaskActivity extends AppCompatActivity {
     Realm realm;
     EmpDatabase database;
 
-    String employeeID;
+    public static String employeeID;
     TaskHelper helper;
     TaskHelper notHelping;
+    public static boolean isClient = true;
 
     void initializeFirebase(){
 
@@ -67,21 +68,28 @@ public class RecieveTaskActivity extends AppCompatActivity {
 
          helper = new TaskHelper();
 
-        tvEid = (TextView) findViewById(R.id.tvEid);
 
-        RealmConfiguration configuration = new RealmConfiguration.Builder(RecieveTaskActivity.this).deleteRealmIfMigrationNeeded().schemaVersion(4).build();
-        Realm.setDefaultConfiguration(configuration);
-        Log.d(TAG , "Realm set");
-        realm = Realm.getDefaultInstance();
-        database = realm.where(EmpDatabase.class).findFirst();
-        employeeID = database.getEid();
-        tvEid.setText(employeeID);
+        String user = getIntent().getStringExtra("User");
+        if(user.equals("Client")){
+            isClient = true;
+            tvEid = (TextView) findViewById(R.id.tvEid);
+
+            RealmConfiguration configuration = new RealmConfiguration.Builder(RecieveTaskActivity.this).deleteRealmIfMigrationNeeded().schemaVersion(4).build();
+            Realm.setDefaultConfiguration(configuration);
+            Log.d(TAG , "Realm set");
+            realm = Realm.getDefaultInstance();
+            database = realm.where(EmpDatabase.class).findFirst();
+            employeeID = database.getEid();
+            tvEid.setText(employeeID);
+
+        }else {
+            employeeID = getIntent().getStringExtra("EID");
+             isClient = false;
+        }
+
 
         initializeFirebase();
         loadRecyclerView();
-
-        helper.setName("Shubham");
-        helper.setLongitude("78");
 
 
 
@@ -105,6 +113,7 @@ public class RecieveTaskActivity extends AppCompatActivity {
                         notHelping.setTime(d.child("time").getValue().toString());
                         notHelping.setLatitude(d.child("Latitude").getValue().toString());
                         notHelping.setPlace(d.child("Address").getValue().toString());
+                        notHelping.setTaskID(d.getKey());
                        helpers.add(notHelping);
                       loadRecyclerView();
 

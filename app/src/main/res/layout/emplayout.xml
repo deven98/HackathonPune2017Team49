@@ -19,6 +19,12 @@
         android:id="@+id/empButton"
         android:text="Add Task"
         android:layout_margin="8dp"
-        android:background="@color/blue_pressed"
-        android:textColor="@color/white"/>
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View Progress"
+        android:id="@+id/btnProgress"
+        android:layout_margin="8dp"/>
 </LinearLayout>
