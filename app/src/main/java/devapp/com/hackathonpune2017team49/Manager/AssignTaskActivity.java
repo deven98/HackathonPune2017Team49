@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -21,7 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
@@ -73,6 +73,31 @@ public class AssignTaskActivity extends AppCompatActivity {
         submitButton = (Button) findViewById(R.id.button_submit);
         IDEditText = (EditText) findViewById(R.id.id_edit_text);
         phoneEditText = (EditText) findViewById(R.id.phone_edit_text);
+
+        manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+        listener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                Toast.makeText(AssignTaskActivity.this, location.toString() , Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+
     }
 
     void initializeFirebase() {
@@ -80,33 +105,6 @@ public class AssignTaskActivity extends AppCompatActivity {
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference();
 
-        manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
-        listener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-
-
-                currentLatitude = location.getLatitude();
-                currentLongitude = location.getLongitude();
-                Distance distance = new Distance();
-                distance.setLang(currentLongitude);
-                distance.setLat(currentLatitude);
-                listOfdistances.add(distance);
-                Log.d(TAG, "onLocationChanged: current location added....");
-            }
-        };
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
      }
 
     void startProcessing(){
@@ -168,18 +166,20 @@ public class AssignTaskActivity extends AppCompatActivity {
         SELECTED_CLIENT =  getIntent().getStringExtra("clientID");
 
 
-        initialize();
-        setOnClickListeners();
-        initializeFirebase();
-
-        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER , 200 , 0 , (android.location.LocationListener) listener);
-
         if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
 
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
 
         }
 
+        initialize();
+        setOnClickListeners();
+        initializeFirebase();
+
+        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER , 0L , 0f ,listener);
+
+        if(manager.getLastKnownLocation(LocationManager.GPS_PROVIDER) != null)
+        Toast.makeText(this, manager.getLastKnownLocation(LocationManager.GPS_PROVIDER).toString(), Toast.LENGTH_SHORT).show();
 
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);

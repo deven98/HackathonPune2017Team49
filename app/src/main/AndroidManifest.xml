@@ -37,6 +37,12 @@
         <activity android:name=".Manager.AssignTaskActivity" />
         <activity android:name=".Client.RecieveTaskActivity" />
         <activity android:name=".Client.MapsActivity" />
+        <activity android:name=".Client.SelectUtilActivity">
+
+            </activity>
+        <activity android:name=".Client.UtilMapActivity">
+
+        </activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
